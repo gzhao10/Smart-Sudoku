@@ -1,12 +1,18 @@
-const Cell = (value) => {
-    return (
-        <div>Sudoku</div>
-    )
-}
+import React, { useState } from 'react'
+import {solveSudoku} from '../api/api'
 
 const Grid = () => {
+    const [solution, setSolution] = useState(null);
+
+    const getSolution = async () => {
+        const result = await solveSudoku('Input1.txt')
+        setSolution(result.solution)
+    }
     return (
-        <Cell/>
+        <div>
+            <button onClick={getSolution}>Solve</button>
+            {solution}
+        </div>
     )
 }
 

@@ -1,5 +1,10 @@
 import sys
 import math
+from flask import Flask, request, jsonify
+from flask_cors import CORS
+
+app = Flask(__name__)
+CORS(app)
 
 ############### FUNCTIONS ###############
 
@@ -115,20 +120,6 @@ def useDegreeHeuristics(cells, MRVlist):
     return max
 
 
-############### SETUP ###############
-
-filename = sys.argv[1]
-input = open(filename)
-lines = input.readlines()
-input.close()
-
-cells = []
-for i in range(len(lines)):
-    if lines[i][0] != '\n':
-        line = lines[i].strip().split()
-        line = [int(val) for val in line]
-        cells.append(line)
-
 
 ############### ALGORITHM ###############
 
@@ -163,13 +154,45 @@ def solve(cells):
 
 ############### OUTPUT ###############
 
-ans = solve(cells)
+# filename = 'Input1.txt'
+# input = open(filename)
+# lines = input.readlines()
+# input.close()
 
-output = open('output.txt', 'w')
-for i in range(len(ans)):
-    for j in range(len(ans[i])):
-        output.write(str(ans[i][j]))
-        if j != len(ans[i]) - 1:
-            output.write(' ')
-    if i != len(ans) - 1:
-        output.write('\n')
+# cells = []
+# for i in range(len(lines)):
+#     if lines[i][0] != '\n':
+#         line = lines[i].strip().split()
+#         line = [int(val) for val in line]
+#         cells.append(line)
+
+# ans = solve(cells)
+
+# output = open('output.txt', 'w')
+# for i in range(len(ans)):
+#     for j in range(len(ans[i])):
+#         output.write(str(ans[i][j]))
+#         if j != len(ans[i]) - 1:
+#             output.write(' ')
+#     if i != len(ans) - 1:
+#         output.write('\n')
+
+@app.route('/solve', methods=['POST'])
+def solve_sudoku():
+    filename = request.json.get('file', '')
+    input = open(filename)
+    lines = input.readlines()
+    input.close()
+
+    cells = []
+    for i in range(len(lines)):
+        if lines[i][0] != '\n':
+            line = lines[i].strip().split()
+            line = [int(val) for val in line]
+            cells.append(line)
+
+    solution = solve(cells)
+    return jsonify({"solution": solution}), 200
+
+if __name__ == '__main__':
+    app.run(port=5000)
